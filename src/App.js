@@ -1,66 +1,63 @@
 // import logo from './logo.svg'; // create-react-app default
 // import './App.css'; // create-react-app default
-import React from 'react';
+import React, { useState } from 'react';
+import { apiData } from './utils/spotifyApi';
+import Playlist from './components/Playlist/Playlist';
 import SearchResults from './components/SearchResults/SearchResults';
 
 function App() {
-  const songs = [{
-    album: 'Jordi',
-    title: 'Memories',
-    artist: 'Maroon 5'
-  },
-  {
-    album: 'Rave & Roses',
-    title: 'Calm Down',
-    artist: 'Rema'
-  },
-  {
-    album: 'Speak Now (Taylor\'s Version)',
-    title: 'Back To December',
-    artist: 'Taylor Swift'
-  },
-  {
-    album: 'Lover',
-    title: 'Lover',
-    artist: 'Taylor Swift'
-  },
-  {
-    album: 'Promises and Lies',
-    title: '(I Can\'t Help) Falling In Love With You',
-    artist: 'UB40'
-  },
-  {
-    album: 'Labour of Love',
-    title: 'Red Red Wine',
-    artist: 'UB40'
-  }];
+  const [searchResults, setSearchResults] = useState(apiData);
 
+  const [playlistName, setPlaylistName] = useState('');
+  const handlePlaylistName = (event) => {
+    setPlaylistName((prevPlaylistName) => event.target.value);
+  };
+
+  const [playlistTracks, setPlaylistTracks] = useState([]);
+  const handlePlaylistAdd = (event) => setPlaylistTracks((prevTracks) => {
+    const trackIndex = parseInt(event.target.dataset.trackid) - 1;
+    return [...prevTracks, searchResults[trackIndex]];
+  });
+  const handlePlaylistDel = (event) => setPlaylistTracks((prevTracks) => {
+    const trackIndex = parseInt(event.target.dataset.trackid);
+    return prevTracks.filter((track) => track.id !== trackIndex);
+  });
+  
   return (
     <div>
-      <SearchResults songs={songs} />
+      <SearchResults
+        handlePlaylistAdd={handlePlaylistAdd}
+        tracks={searchResults} 
+      />
+      <Playlist
+        handlePlaylistDel={handlePlaylistDel}
+        handlePlaylistName={handlePlaylistName}
+        playlistName={playlistName}
+        tracks={playlistTracks} 
+      />
     </div>
   );
 
   /* create-react-app default
   return (
-      <div className="App">
-          <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <p>
-                  Edit <code>src/App.js</code> and save to reload.
-              </p>
-              <a
-                  className="App-link"
-                  href="https://reactjs.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-              >
-                  Learn React
-              </a>
-          </header>
-      </div>
-  );
-  */
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  ); */
+
 };
 
 export default App;

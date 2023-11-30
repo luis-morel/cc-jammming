@@ -1,7 +1,9 @@
 import React from 'react';
 
 function SaveToSpotifyButton () {
-    return ();
+    return (
+      <button>SAVE TO SPOTIFY</button>
+    );
 };
 
 export default SaveToSpotifyButton;
