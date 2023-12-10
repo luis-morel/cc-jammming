@@ -14,13 +14,21 @@ function App() {
   };
 
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const handlePlaylistAdd = (event) => setPlaylistTracks((prevTracks) => {
-    const trackIndex = parseInt(event.target.dataset.trackid) - 1;
-    return [...prevTracks, searchResults[trackIndex]];
+  const handlePlaylistAdd = (event) => setPlaylistTracks((prevPlaylistTracks) => {
+    const playlistTrackId = parseInt(event.target.dataset.trackid);
+    const playlistTrack = { ...searchResults.filter((track) => track.id === playlistTrackId)[0] };
+    playlistTrack.playlistTrackIndex = prevPlaylistTracks.length;
+    let newPlaylist = prevPlaylistTracks.map((track, i) => {
+      track.playlistTrackIndex = i;
+      return track;
+    });    
+    newPlaylist = [...prevPlaylistTracks, playlistTrack];
+    return newPlaylist;
   });
-  const handlePlaylistDel = (event) => setPlaylistTracks((prevTracks) => {
-    const trackIndex = parseInt(event.target.dataset.trackid);
-    return prevTracks.filter((track) => track.id !== trackIndex);
+  const handlePlaylistDel = (event) => setPlaylistTracks((prevPlaylistTracks) => {
+    const playlistTrackIndex = parseInt(event.target.dataset.trackindex);
+    const newPlaylist = prevPlaylistTracks.filter((track) => track.playlistTrackIndex !== playlistTrackIndex);
+    return newPlaylist;
   });
   
   return (

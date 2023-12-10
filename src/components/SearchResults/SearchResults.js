@@ -1,11 +1,11 @@
 import React from 'react';
 
-function SearchResults(props) {
-  const { handlePlaylistAdd, tracks } = props;
+function SearchResults({ handlePlaylistAdd, tracks }) {
+  
   return (
     <div>
       <p>Results</p>
-      {tracks.map((track, i) => {
+      {tracks.map((track) => {
         return (
           <div key={track.id}>
             <p>{track.title}</p>
