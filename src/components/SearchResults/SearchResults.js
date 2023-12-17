@@ -7,10 +7,10 @@ function SearchResults({ handlePlaylistAdd, tracks }) {
       <p>Results</p>
       {tracks.map((track) => {
         return (
-          <div key={track.id}>
+          <div key={track.uri}>
             <p>{track.title}</p>
             <p>{track.artist} | {track.album}</p>
-            <button data-trackid={track.id} onClick={handlePlaylistAdd}>+</button>
+            <button data-trackuri={track.uri} onClick={handlePlaylistAdd}>+</button>
           </div>
         );
       })}

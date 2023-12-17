@@ -15,8 +15,8 @@ function App() {
 
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const handlePlaylistAdd = (event) => setPlaylistTracks((prevPlaylistTracks) => {
-    const playlistTrackId = parseInt(event.target.dataset.trackid);
-    const playlistTrack = { ...searchResults.filter((track) => track.id === playlistTrackId)[0] };
+    const playlistTrackUri = event.target.dataset.trackuri;
+    const playlistTrack = { ...searchResults.filter((track) => track.uri === playlistTrackUri)[0] };
     playlistTrack.playlistTrackIndex = prevPlaylistTracks.length;
     let newPlaylist = prevPlaylistTracks.map((track, i) => {
       track.playlistTrackIndex = i;
@@ -30,6 +30,12 @@ function App() {
     const newPlaylist = prevPlaylistTracks.filter((track) => track.playlistTrackIndex !== playlistTrackIndex);
     return newPlaylist;
   });
+  const handlePlaylistSaveToSpotify = (event) => {
+    const playlistTrackUris = playlistTracks.map((track) => track.uri);
+    console.log('Playlist Track URIs:', playlistTrackUris);
+    setPlaylistName((prevPlaylistName) => '');
+    setPlaylistTracks((prevPlaylistTracks) => []);
+  }
   
   return (
     <div>
@@ -40,6 +46,7 @@ function App() {
       <Playlist
         handlePlaylistDel={handlePlaylistDel}
         handlePlaylistName={handlePlaylistName}
+        handlePlaylistSaveToSpotify={handlePlaylistSaveToSpotify}
         playlistName={playlistName}
         tracks={playlistTracks} 
       />

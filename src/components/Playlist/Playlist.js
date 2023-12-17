@@ -1,7 +1,14 @@
 import React from 'react';
 import SaveToSpotifyButton from '../SaveToSpotifyButton/SaveToSpotifyButton';
 
-function Playlist({ handlePlaylistDel, handlePlaylistName, playlistName, tracks }) {
+function Playlist(props) {
+  const { 
+    handlePlaylistDel,
+    handlePlaylistName,
+    handlePlaylistSaveToSpotify,
+    playlistName,
+    tracks
+  } = props;
   
   return (
     <div>
@@ -15,7 +22,7 @@ function Playlist({ handlePlaylistDel, handlePlaylistName, playlistName, tracks 
           </div>
         );
       })}
-      <SaveToSpotifyButton title={playlistName} tracks={tracks}/>
+      <SaveToSpotifyButton savePlaylistToSpotify={handlePlaylistSaveToSpotify} title={playlistName} tracks={tracks}/>
     </div>
   );
 };
