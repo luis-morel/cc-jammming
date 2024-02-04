@@ -1,12 +1,12 @@
 // import logo from './logo.svg'; // create-react-app default
 // import './App.css'; // create-react-app default
 import React, { useState } from 'react';
-import { apiData } from './utils/spotifyApi';
+import spotifyApi from './utils/spotifyApi';
 import Playlist from './components/Playlist/Playlist';
 import SearchResults from './components/SearchResults/SearchResults';
 
 function App() {
-  const [searchResults, setSearchResults] = useState(apiData);
+  const [searchResults, setSearchResults] = useState(spotifyApi.apiData);
 
   const [playlistName, setPlaylistName] = useState('');
   const handlePlaylistName = (event) => {
@@ -31,6 +31,7 @@ function App() {
     return newPlaylist;
   });
   const handlePlaylistSaveToSpotify = (event) => {
+    spotifyApi.requestUserAuth();
     const playlistTrackUris = playlistTracks.map((track) => track.uri);
     console.log('Playlist Track URIs:', playlistTrackUris);
     setPlaylistName((prevPlaylistName) => '');

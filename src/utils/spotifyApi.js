@@ -1,5 +1,15 @@
 // Front-End Spotify API
 
+let generateRandomString = (length) => {
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = '';
+
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
+
 export default {
   apiData: [
     {
@@ -44,6 +54,7 @@ export default {
     const clientId = '126cea50d70246a089f8210a36bc82f0';
     const redirectUri = 'http://localhost:3000/';
     const scope = 'playlist-modify-private playlist-modify-public';
+    const stateKey = 'spotifyAuthState';
 
     const state = generateRandomString(16);
     localStorage.setItem(stateKey, state);
@@ -54,5 +65,7 @@ export default {
     queryUrl += '&scope=' + encodeURIComponent(scope);
     queryUrl += '&redirect_uri=' + encodeURIComponent(redirectUri);
     queryUrl += '&state=' + encodeURIComponent(state);
+
+    window.location = queryUrl;
   }
 }
