@@ -16,6 +16,7 @@ function SearchResults({ handlePlaylistAdd, tracks }) {
       })}
     </div>
   );
+  
 };
 
 export default SearchResults;

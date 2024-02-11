@@ -2,6 +2,7 @@ import React from 'react';
 import SaveToSpotifyButton from '../SaveToSpotifyButton/SaveToSpotifyButton';
 
 function Playlist(props) {
+
   const { 
     handlePlaylistDel,
     handlePlaylistName,
@@ -25,6 +26,7 @@ function Playlist(props) {
       <SaveToSpotifyButton savePlaylistToSpotify={handlePlaylistSaveToSpotify} title={playlistName} tracks={tracks}/>
     </div>
   );
+  
 };
 
 export default Playlist;

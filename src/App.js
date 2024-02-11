@@ -6,6 +6,20 @@ import Playlist from './components/Playlist/Playlist';
 import SearchResults from './components/SearchResults/SearchResults';
 
 function App() {
+
+  const getUrlHashParams = () => {
+    let regEx = /([^&;=]+)=?([^&;]*)/g;
+    let results;
+    let urlHash = window.location.hash.substring(1);
+    let urlHashParams = {};
+
+    while (results = regEx.exec(urlHash)) {
+      urlHashParams[results[1]] = decodeURIComponent(results[2]);
+    };
+
+    return urlHashParams;
+  };
+
   const [searchResults, setSearchResults] = useState(spotifyApi.apiData);
 
   const [playlistName, setPlaylistName] = useState('');
@@ -21,7 +35,7 @@ function App() {
     let newPlaylist = prevPlaylistTracks.map((track, i) => {
       track.playlistTrackIndex = i;
       return track;
-    });    
+    });
     newPlaylist = [...prevPlaylistTracks, playlistTrack];
     return newPlaylist;
   });
@@ -31,25 +45,65 @@ function App() {
     return newPlaylist;
   });
   const handlePlaylistSaveToSpotify = (event) => {
-    spotifyApi.requestUserAuth();
-    const playlistTrackUris = playlistTracks.map((track) => track.uri);
-    console.log('Playlist Track URIs:', playlistTrackUris);
-    setPlaylistName((prevPlaylistName) => '');
-    setPlaylistTracks((prevPlaylistTracks) => []);
-  }
-  
+    const trackCount = playlistTracks.length;
+
+    if (trackCount > 0) {
+      const playlistTrackUris = playlistTracks.map((track) => track.uri);
+
+      console.log('Playlist Track URIs:', playlistTrackUris);
+
+      if (playlistName === '') {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const hour = date.getHours();
+        const minute = date.getMinutes();
+
+        if (hour < 10) { hour = `0${hour}`; };
+        if (minute < 10) { minute = `0${minute}`; };
+
+        const newPlaylistName = `Playlist-${year}-${month}-${day}-${hour}-${minute}`;
+
+        setPlaylistName((prevPlaylistName) => newPlaylistName);
+      };
+
+      if (Date.now() > spotifyToken.expiresAt) { spotifyApi.requestUserAuth(spotifyAuthStateKey); }
+      else {
+        // Spotify API call: Add playlist to Spotify
+        setPlaylistName((prevPlaylistName) => '');
+        setPlaylistTracks((prevPlaylistTracks) => []);
+      };
+    };
+  };
+
+  let currentTime = Date.now();
+  let spotifyToken = getUrlHashParams();
+  let spotifyAuthStateKey = 'spotifyAuthState';
+  let spotifyAuthState = localStorage.getItem(spotifyAuthStateKey);
+
+  if (spotifyToken.access_token) {
+    if (spotifyAuthState === spotifyToken.state) {
+      spotifyToken.expiresAt = currentTime + ((spotifyToken.expires_in - 5) * 1000);
+      handlePlaylistSaveToSpotify();
+    } else {
+      console.log('Spotify authorization error; reauthorizing');
+      spotifyApi.requestUserAuth(spotifyAuthStateKey);
+    };
+  };
+
   return (
     <div>
       <SearchResults
         handlePlaylistAdd={handlePlaylistAdd}
-        tracks={searchResults} 
+        tracks={searchResults}
       />
       <Playlist
         handlePlaylistDel={handlePlaylistDel}
         handlePlaylistName={handlePlaylistName}
         handlePlaylistSaveToSpotify={handlePlaylistSaveToSpotify}
         playlistName={playlistName}
-        tracks={playlistTracks} 
+        tracks={playlistTracks}
       />
     </div>
   );

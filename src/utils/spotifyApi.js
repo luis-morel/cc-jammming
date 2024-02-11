@@ -49,12 +49,11 @@ export default {
       artist: 'UB40'
     }
   ],
-  requestUserAuth: () => {
+  requestUserAuth: (stateKey) => {
     const baseUrl = 'https://accounts.spotify.com/authorize';
     const clientId = '126cea50d70246a089f8210a36bc82f0';
     const redirectUri = 'http://localhost:3000/';
     const scope = 'playlist-modify-private playlist-modify-public';
-    const stateKey = 'spotifyAuthState';
 
     const state = generateRandomString(16);
     localStorage.setItem(stateKey, state);
