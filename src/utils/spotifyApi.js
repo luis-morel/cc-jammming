@@ -49,14 +49,14 @@ export default {
       artist: 'UB40'
     }
   ],
-  requestUserAuth: (stateKey) => {
+  requestUserAuth: (spotifyAuthStateKey) => {
     const baseUrl = 'https://accounts.spotify.com/authorize';
     const clientId = '126cea50d70246a089f8210a36bc82f0';
     const redirectUri = 'http://localhost:3000/';
     const scope = 'playlist-modify-private playlist-modify-public';
 
     const state = generateRandomString(16);
-    localStorage.setItem(stateKey, state);
+    sessionStorage.setItem(spotifyAuthStateKey, state);
 
     let queryUrl = baseUrl;
     queryUrl += '?response_type=token';
@@ -66,5 +66,40 @@ export default {
     queryUrl += '&state=' + encodeURIComponent(state);
 
     window.location = queryUrl;
+  },
+  search: async (query, token) => {
+    const baseUrl = 'https://api.spotify.com/v1/search?';
+    
+    let queryUrl = baseUrl;
+    queryUrl += `q=${encodeURIComponent(query)}`;
+    queryUrl += '&type=track';
+
+    const spotifyTracks = [];
+
+    await fetch(queryUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      };
+      throw new Error('Spotify search API call failed.');
+    }).then((data) => {
+      console.log('Spotify search API response data:\n\n', data);      
+      data.tracks.items.forEach(track => {
+        const artists = track.artists.map(artist => artist.name).join(", ");
+        spotifyTracks.push({
+          uri: track.uri,
+          album: track.album.name,
+          title: track.name,
+          artist: artists
+        }); 
+      });
+    }).catch((error) => {
+      console.log(error);
+    });
+    return spotifyTracks;
   }
-}
+};

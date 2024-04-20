@@ -1,13 +1,20 @@
-// import logo from './logo.svg'; // create-react-app default
-// import './App.css'; // create-react-app default
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import spotifyApi from './utils/spotifyApi';
 import Playlist from './components/Playlist/Playlist';
+import SearchBar from './components/SearchBar/SearchBar';
+import SearchButton from './components/SearchButton/SearchButton';
 import SearchResults from './components/SearchResults/SearchResults';
 
 function App() {
 
-  const getUrlHashParams = () => {
+  const spotifyAuthStateKey = 'spotifyAuthState';
+  let spotifyAuthState = sessionStorage.getItem(spotifyAuthStateKey);
+  const spotifySearchInputKey = 'spotifySearchInput';
+  let spotifySearchInput = sessionStorage.getItem(spotifySearchInputKey);
+  const spotifyTokenExpiresAtKey = 'spotifyTokenExpiresAt';
+  let spotifyTokenExpiresAt = sessionStorage.getItem(spotifyTokenExpiresAtKey);
+
+  function getUrlHashParams() {
     let regEx = /([^&;=]+)=?([^&;]*)/g;
     let results;
     let urlHash = window.location.hash.substring(1);
@@ -20,31 +27,97 @@ function App() {
     return urlHashParams;
   };
 
+  function verifySpotifyToken(spotifyToken) {
+    if (spotifyToken.access_token) {
+      if (spotifyAuthState === spotifyToken.state) {
+        const currentTime = Date.now();
+        if (!spotifyTokenExpiresAt) {
+          console.log('Setting Spotify access token expiration timestamp.');
+          const requestedAt = currentTime - 2000;
+          sessionStorage.setItem(spotifyTokenExpiresAtKey, requestedAt + spotifyToken.expires_in * 1000);
+          return true;
+        } else if (currentTime < spotifyTokenExpiresAt) {
+          return true;
+        } else {
+          console.log('Spotify access token expired.');
+          return false;
+        }
+      } else {
+        console.log('Spotify access token state verification failed.');
+        return false;
+      };
+    };
+    return false;
+  };
+
+  const spotifyToken = getUrlHashParams();
+
+  const [searchInput, setSearchInput] = useState('');
+  function handleSearchInput(event) {
+    setSearchInput((prevSearchInput) => event.target.value);
+  };
+
   const [searchResults, setSearchResults] = useState(spotifyApi.apiData);
+  
+  useEffect(() => {
+    if (spotifySearchInput) {
+      updateSearch();
+    };
+  }, []);
+
+  async function updateSearch () {
+    if (spotifySearchInput) {
+      if (verifySpotifyToken(spotifyToken)) {
+        const newSpotifyTracks = await spotifyApi.search(spotifySearchInput, spotifyToken.access_token);
+        console.log('newSpotifyTracks:\n', newSpotifyTracks);
+        setSearchResults((prevSearchResults) => newSpotifyTracks ? newSpotifyTracks : spotifyApi.apiData);
+        // Save tracks to sessionStorage?
+      } else {
+        console.log('Requesting Spotify user authorization');
+        spotifyApi.requestUserAuth(spotifyAuthStateKey);
+      };
+    };
+  };
+
+  function handleApiSearch (event) {
+    if (searchInput) {
+      spotifySearchInput = searchInput;
+      sessionStorage.setItem(spotifySearchInputKey, searchInput);
+      updateSearch();
+    } else {
+      console.log('Spotify search input is required.');
+      alert('Spotify search input is required.');
+    };
+  };
 
   const [playlistName, setPlaylistName] = useState('');
-  const handlePlaylistName = (event) => {
+  function handlePlaylistName(event) {
     setPlaylistName((prevPlaylistName) => event.target.value);
   };
 
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const handlePlaylistAdd = (event) => setPlaylistTracks((prevPlaylistTracks) => {
-    const playlistTrackUri = event.target.dataset.trackuri;
-    const playlistTrack = { ...searchResults.filter((track) => track.uri === playlistTrackUri)[0] };
-    playlistTrack.playlistTrackIndex = prevPlaylistTracks.length;
-    let newPlaylist = prevPlaylistTracks.map((track, i) => {
-      track.playlistTrackIndex = i;
-      return track;
+  function handlePlaylistAdd(event) {
+    setPlaylistTracks((prevPlaylistTracks) => {
+      const playlistTrackUri = event.target.dataset.trackuri;
+      const playlistTrack = { ...searchResults.filter((track) => track.uri === playlistTrackUri)[0] };
+      playlistTrack.playlistTrackIndex = prevPlaylistTracks.length;
+      let newPlaylist = prevPlaylistTracks.map((track, i) => {
+        track.playlistTrackIndex = i;
+        return track;
+      });
+      newPlaylist = [...prevPlaylistTracks, playlistTrack];
+      return newPlaylist;
     });
-    newPlaylist = [...prevPlaylistTracks, playlistTrack];
-    return newPlaylist;
-  });
-  const handlePlaylistDel = (event) => setPlaylistTracks((prevPlaylistTracks) => {
-    const playlistTrackIndex = parseInt(event.target.dataset.trackindex);
-    const newPlaylist = prevPlaylistTracks.filter((track) => track.playlistTrackIndex !== playlistTrackIndex);
-    return newPlaylist;
-  });
-  const handlePlaylistSaveToSpotify = (event) => {
+  };
+  function handlePlaylistDel(event) {
+    setPlaylistTracks((prevPlaylistTracks) => {
+      const playlistTrackIndex = parseInt(event.target.dataset.trackindex);
+      const newPlaylist = prevPlaylistTracks.filter((track) => track.playlistTrackIndex !== playlistTrackIndex);
+      return newPlaylist;
+    });
+  };
+
+  function handlePlaylistSaveToSpotify(event) {
     const trackCount = playlistTracks.length;
 
     if (trackCount > 0) {
@@ -57,8 +130,8 @@ function App() {
         const year = date.getFullYear();
         const month = date.getMonth() + 1;
         const day = date.getDate();
-        const hour = date.getHours();
-        const minute = date.getMinutes();
+        let hour = date.getHours();
+        let minute = date.getMinutes();
 
         if (hour < 10) { hour = `0${hour}`; };
         if (minute < 10) { minute = `0${minute}`; };
@@ -77,23 +150,14 @@ function App() {
     };
   };
 
-  let currentTime = Date.now();
-  let spotifyToken = getUrlHashParams();
-  let spotifyAuthStateKey = 'spotifyAuthState';
-  let spotifyAuthState = localStorage.getItem(spotifyAuthStateKey);
-
-  if (spotifyToken.access_token) {
-    if (spotifyAuthState === spotifyToken.state) {
-      spotifyToken.expiresAt = currentTime + ((spotifyToken.expires_in - 5) * 1000);
-      handlePlaylistSaveToSpotify();
-    } else {
-      console.log('Spotify authorization error; reauthorizing');
-      spotifyApi.requestUserAuth(spotifyAuthStateKey);
-    };
-  };
-
   return (
     <div>
+      <SearchBar
+        handleSearchInput={handleSearchInput}
+      />
+      <SearchButton
+        handleApiSearch={handleApiSearch}
+      />
       <SearchResults
         handlePlaylistAdd={handlePlaylistAdd}
         tracks={searchResults}
@@ -108,26 +172,6 @@ function App() {
     </div>
   );
 
-  /* create-react-app default
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  ); */
-
-};
+}; // end of function App()
 
 export default App;
