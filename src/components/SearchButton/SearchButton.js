@@ -1,9 +1,10 @@
 import React from 'react';
+import './SearchButton.css';
 
 function SearchButton ({ handleApiSearch }) {
     return (
-      <div>
-        <button onClick={handleApiSearch}>Search</button>
+      <div className='search-button'>
+        <button onClick={handleApiSearch}>SEARCH</button>
       </div>
     );
 };

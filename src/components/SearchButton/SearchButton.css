@@ -1,0 +1,17 @@
+.search-button {
+  margin: 0 auto;
+  max-width: fit-content;
+}
+
+.search-button button {
+  background-color: #000934;
+  border: none;
+  border-radius: .5rem;
+  color: white;
+  padding: .4rem 1.5rem;
+}
+
+.search-button button:hover {
+  background-color: lightgray;
+  color: #7D12F8;
+}

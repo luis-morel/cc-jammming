@@ -1,0 +1,13 @@
+.search-results-container {
+  background: #0D0C45;
+  border-radius: .4rem;
+  margin: 2.0rem;
+  min-width: 25%;
+  opacity: 0.9;
+  padding: 10px;
+}
+
+.search-results-title {
+  color: white;
+  margin: 0;
+}

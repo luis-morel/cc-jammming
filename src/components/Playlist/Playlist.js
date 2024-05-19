@@ -1,32 +1,47 @@
 import React from 'react';
 import SaveToSpotifyButton from '../SaveToSpotifyButton/SaveToSpotifyButton';
+import Track from '../Track/Track.js';
+import './Playlist.css';
 
 function Playlist(props) {
 
-  const { 
+  const {
     handlePlaylistDel,
     handlePlaylistName,
     handlePlaylistSaveToSpotify,
     playlistName,
     tracks
   } = props;
-  
+
   return (
-    <div>
-      <input type="text" value={playlistName} onChange={handlePlaylistName}/>
-      {tracks.length === 0 ? <p></p> : tracks.map((track) => {
-        return (
-          <div key={track.playlistTrackIndex}>
-            <p>{track.title}</p>
-            <p>{track.artist} | {track.album}</p>
-            <button data-trackindex={track.playlistTrackIndex} onClick={handlePlaylistDel}>-</button>
-          </div>
-        );
-      })}
-      <SaveToSpotifyButton savePlaylistToSpotify={handlePlaylistSaveToSpotify} title={playlistName} tracks={tracks}/>
+    <div className='playlist-container'>
+      <div className='playlist-input'>
+        <input
+          onChange={handlePlaylistName}
+          placeholder='Name your playlist'
+          type="text"
+          value={playlistName}
+        />
+      </div>
+      <div className='playlist-track-container'>
+        {tracks.length === 0 ? <p></p>
+          :
+          tracks.map((track) => {
+            return (
+              <Track
+                handlePlaylistDel={handlePlaylistDel}
+                key={track.uri}
+                track={track}
+                type={'playlist'}
+              />
+            )
+          })
+        }
+      </div>
+      <SaveToSpotifyButton savePlaylistToSpotify={handlePlaylistSaveToSpotify} title={playlistName} tracks={tracks} />
     </div>
   );
-  
+
 };
 
 export default Playlist;

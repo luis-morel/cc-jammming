@@ -1,0 +1,11 @@
+.search-bar {
+  margin: 4.2rem auto 1.2rem;
+  max-width: fit-content;
+}
+
+.search-bar input {
+  border-radius: 0.4rem;
+  color: #7D12F8;
+  font-size: 0.9rem;
+  padding: .7rem 4rem .7rem 1rem;
+}

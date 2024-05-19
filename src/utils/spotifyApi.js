@@ -11,49 +11,93 @@ let generateRandomString = (length) => {
 };
 
 export default {
-  apiData: [
-    {
-      uri: 'spotify:track:101',
-      album: 'Jordi',
-      title: 'Memories',
-      artist: 'Maroon 5'
-    },
-    {
-      uri: 'spotify:track:102',
-      album: 'Rave & Roses',
-      title: 'Calm Down',
-      artist: 'Rema'
-    },
-    {
-      uri: 'spotify:track:103',
-      album: 'Speak Now (Taylor\'s Version)',
-      title: 'Back To December',
-      artist: 'Taylor Swift'
-    },
-    {
-      uri: 'spotify:track:104',
-      album: 'Lover',
-      title: 'Lover',
-      artist: 'Taylor Swift'
-    },
-    {
-      uri: 'spotify:track:105',
-      album: 'Promises and Lies',
-      title: '(I Can\'t Help) Falling In Love With You',
-      artist: 'UB40'
-    },
-    {
-      uri: 'spotify:track:106',
-      album: 'Labour of Love',
-      title: 'Red Red Wine',
-      artist: 'UB40'
-    }
-  ],
+  addTracksToPlaylist: async (tracks, playlistId, token) => {
+    const baseUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
+
+    let playlistUpdated = false;
+
+    await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        uris: tracks
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      };
+      throw new Error('Failed to add tracks to Spotify playlist.');
+    }).then((data) => {
+      console.log(`Spotify playlist snapshot id: ${data.snapshot_id}`);
+      playlistUpdated = true;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    return playlistUpdated;
+  },
+  createPlaylist: async (playlistName, userId, token) => {
+    const baseUrl = `https://api.spotify.com/v1/users/${userId}/playlists`;
+
+    let spotifyPlaylistId = '';
+
+    await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: playlistName,
+        description: playlistName,
+        public: false
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      };
+      throw new Error('Failed to create Spotify playlist.');
+    }).then((data) => {
+      console.log(`Spotify playlist id: ${data.id}`);
+      spotifyPlaylistId = data.id;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    return spotifyPlaylistId;
+  },
+  getUserId: async (token) => {
+    const baseUrl = 'https://api.spotify.com/v1/me'
+
+    let spotifyUserId = '';
+
+    await fetch(baseUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      };
+      throw new Error('Failed to get Spotify user id.');
+    }).then((data) => {
+      console.log(`Spotify user id: ${data.id}`);
+      spotifyUserId = data.id;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+    return spotifyUserId;
+  },
   requestUserAuth: (spotifyAuthStateKey) => {
     const baseUrl = 'https://accounts.spotify.com/authorize';
     const clientId = '126cea50d70246a089f8210a36bc82f0';
     const redirectUri = 'http://localhost:3000/';
-    const scope = 'playlist-modify-private playlist-modify-public';
+    const scope = 'playlist-modify-private playlist-modify-public user-read-email user-read-private';
 
     const state = generateRandomString(16);
     sessionStorage.setItem(spotifyAuthStateKey, state);
@@ -68,8 +112,7 @@ export default {
     window.location = queryUrl;
   },
   search: async (query, token) => {
-    const baseUrl = 'https://api.spotify.com/v1/search?';
-    
+    const baseUrl = 'https://api.spotify.com/v1/search?';    
     let queryUrl = baseUrl;
     queryUrl += `q=${encodeURIComponent(query)}`;
     queryUrl += '&type=track';
@@ -100,6 +143,7 @@ export default {
     }).catch((error) => {
       console.log(error);
     });
+
     return spotifyTracks;
   }
 };

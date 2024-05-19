@@ -1,0 +1,17 @@
+.save-to-spotify-button {
+  margin: 1.0rem auto;
+  max-width: fit-content;
+}
+
+.save-to-spotify-button button {
+  background-color: #7d12f8;
+  border: none;
+  border-radius: 0.4rem;
+  color: white;
+  padding: .4rem 1.5rem;
+}
+
+.save-to-spotify-button button:hover {
+  background-color: lightgray;
+  color: #7D12F8;
+}

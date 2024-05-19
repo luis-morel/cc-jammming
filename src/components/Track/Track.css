@@ -1,0 +1,37 @@
+.spotify-track-container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  max-width: 25.0rem;
+}
+
+.spotify-track-button {
+  margin: auto 0.5rem;
+}
+
+.spotify-track-button button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1.0rem;
+}
+
+.spotify-track-button button:hover {
+  color: tomato;
+}
+
+.spotify-track {
+  color: white;
+  margin: 0.5rem;
+  width: 75%;
+}
+
+.spotify-track p {
+  margin: 0.4rem 0;
+}
+
+.spotify-track-title {
+  color: lightpink;
+  font-size: 1rem;
+  font-weight: bold;
+}

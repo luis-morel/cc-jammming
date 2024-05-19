@@ -1,0 +1,27 @@
+.playlist-container {
+  background: #0D0C45;
+  border-radius: .4rem;
+  margin: 2.0rem;
+  min-width: 25%;
+  opacity: 0.9;
+  padding: 10px;
+}
+
+.playlist-container input {
+  border-radius: .2rem;
+  margin: .15rem;
+  padding: .35rem 3rem .35rem .5rem;
+
+}
+
+.playlist-input {
+  margin: 0.3rem auto;
+  max-width: fit-content;
+}
+
+.playlist-input input {
+  border-radius: 0.4rem;
+  color: #7D12F8;
+  font-size: 0.9rem;
+  padding: .7rem 4rem .7rem 1rem;
+}
