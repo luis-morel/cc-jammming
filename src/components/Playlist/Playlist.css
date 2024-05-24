@@ -15,7 +15,7 @@
 }
 
 .playlist-input {
-  margin: 0.3rem auto;
+  margin: 5px auto 15px;
   max-width: fit-content;
 }
 
@@ -24,4 +24,9 @@
   color: #7D12F8;
   font-size: 0.9rem;
   padding: .7rem 4rem .7rem 1rem;
+}
+
+.playlist-track-container {
+  max-height: 400px;
+  overflow: auto;
 }

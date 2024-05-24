@@ -30,7 +30,7 @@ function Playlist(props) {
             return (
               <Track
                 handlePlaylistDel={handlePlaylistDel}
-                key={track.uri}
+                key={`${track.uri}-${Math.floor(Math.random() * 10000000)}`}
                 track={track}
                 type={'playlist'}
               />

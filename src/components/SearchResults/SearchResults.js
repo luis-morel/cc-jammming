@@ -6,13 +6,15 @@ function SearchResults({ handlePlaylistAdd, tracks }) {
 
   return (
     <div className='search-results-container'>
-      <h2 className='search-results-title'>Results</h2>
+      <div className='search-results-header'>
+        <h2 className='search-results-title'>Results</h2>
+      </div>
       <div className='search-results-track-container'>
         {tracks.map((track) => {
           return (
             <Track
               handlePlaylistAdd={handlePlaylistAdd}
-              key={track.uri} 
+              key={track.uri}
               track={track}
               type={'search'}
             />

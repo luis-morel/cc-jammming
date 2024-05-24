@@ -2,7 +2,7 @@ import React from 'react';
 import './Track.css';
 
 function Track({ handlePlaylistAdd, handlePlaylistDel, track, type }) {
-  const buttonText = type === 'playlist' ? 'x' : '+';
+  const buttonText = type === 'playlist' ? '–' : '+';
 
   return (
     <div className='spotify-track-container'>
